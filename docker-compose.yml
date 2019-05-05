@@ -1,6 +1,5 @@
 version: '3'
 services:
-
   db:
     restart: always
     image: postgres:9.6-alpine
@@ -34,8 +33,7 @@ services:
 #      - ./elasticsearch:/usr/share/elasticsearch/data
 
   web:
-    build: .
-    image: tootsuite/mastodon
+    image: nexusuw/mastodon:latest
     restart: always
     env_file: .env.production
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000 -b '0.0.0.0'"
@@ -45,7 +43,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider --header 'x-forwarded-proto: https' --proxy=off localhost:3000/api/v1/instance || exit 1"]
     ports:
-      - "127.0.0.1:3000:3000"
+      - "3000:3000"
     depends_on:
       - db
       - redis
@@ -54,8 +52,7 @@ services:
       - ./public/system:/mastodon/public/system
 
   streaming:
-    build: .
-    image: tootsuite/mastodon
+    image: nexusuw/mastodon:latest
     restart: always
     env_file: .env.production
     command: yarn start
@@ -65,14 +62,13 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider --header 'x-forwarded-proto: https' --proxy=off localhost:4000/api/v1/streaming/health || exit 1"]
     ports:
-      - "127.0.0.1:4000:4000"
+      - "4000:4000"
     depends_on:
       - db
       - redis
 
   sidekiq:
-    build: .
-    image: tootsuite/mastodon
+    image: nexusuw/mastodon:latest
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq
